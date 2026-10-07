@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Teto Territory </title>
+  <title>Teto Territory</title>
   <style>
-    :root { --fg: #CE445B; --accent: #DF8A9C; }
+    :root { --bg: #622530; --fg: #CE445B; --accent: #DF8A9C; }
     * { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
     body {
+      background-color: var(--bg);
       background-image: url("tetobg.gif");
       background-repeat: repeat;
       background-size: 180px auto;
@@ -21,7 +22,6 @@
       padding: 2rem;
     }
 
-  
     .stage { perspective: 800px; }
 
     #hero {
@@ -33,13 +33,11 @@
       will-change: transform;
       cursor: pointer;
     }
-
   </style>
 </head>
 <body>
 
   <div class="stage">
-   
     <img id="hero" src="tetodancing.gif" alt="Hover Teto">
   </div>
 
@@ -47,14 +45,13 @@
 
   <script>
     const hero = document.getElementById('hero');
-    const MAX_TILT = 15;   
+    const MAX_TILT = 15;
     const MAX_SHIFT = 20;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     hero.addEventListener('pointermove', (e) => {
       if (reduceMotion) return;
       const box = hero.getBoundingClientRect();
-    
       const x = ((e.clientX - box.left) / box.width - 0.5) * 2;
       const y = ((e.clientY - box.top) / box.height - 0.5) * 2;
 
@@ -67,10 +64,8 @@
       hero.style.transform = '';
     });
 
-   
     const music = document.getElementById('music');
 
-  
     music.play().catch(() => {
       const events = ['pointerdown', 'keydown', 'touchstart'];
       const start = () => {
