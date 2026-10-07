@@ -41,7 +41,9 @@
     <img id="hero" src="tetodancing.gif" alt="Hover Teto">
   </div>
 
-  <audio id="music" src="Tetoterritory.mp3" loop></audio>
+  <audio id="music" loop>
+    <source src="Tetoterritory.mp3" type="audio/mpeg">
+  </audio>
 
   <script>
     const hero = document.getElementById('hero');
@@ -65,16 +67,56 @@
     });
 
     const music = document.getElementById('music');
+    const SONG = 'Tetoterritory.mp3';
+    const events = ['pointerdown', 'keydown', 'touchstart'];
+    let started = false;
+    let busy = false;
+    let ctx = null;
 
-    music.play().catch(() => {
-      const events = ['pointerdown', 'keydown', 'touchstart'];
-      const start = () => {
-        music.play();
-        events.forEach(ev => document.removeEventListener(ev, start));
-      };
-      events.forEach(ev => document.addEventListener(ev, start));
-    });
-    music.addEventListener('error', () => document.body.append('Audio error ' + music.error.code));
+    async function playWithWebAudio() {
+      ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+      const response = await fetch(SONG);
+      const data = await response.arrayBuffer();
+      const buffer = await ctx.decodeAudioData(data);
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.loop = true;
+      source.connect(ctx.destination);
+      await ctx.resume();
+      source.start(0);
+    }
+
+    function stopListening() {
+      events.forEach(ev => document.removeEventListener(ev, onGesture));
+    }
+
+    async function startMusic(fromGesture) {
+      if (started || busy) return;
+      busy = true;
+      try {
+        await music.play();
+        started = true;
+        stopListening();
+      } catch (err) {
+        if (err.name !== 'NotAllowedError' && fromGesture) {
+          try {
+            await playWithWebAudio();
+            started = true;
+            stopListening();
+          } catch (e) {
+            console.error('Music failed:', e);
+          }
+        }
+      }
+      busy = false;
+    }
+
+    function onGesture() {
+      startMusic(true);
+    }
+
+    startMusic(false);
+    events.forEach(ev => document.addEventListener(ev, onGesture));
   </script>
 </body>
 </html>
