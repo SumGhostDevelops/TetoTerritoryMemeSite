@@ -74,6 +74,7 @@
       };
       events.forEach(ev => document.addEventListener(ev, start));
     });
+    music.addEventListener('error', () => document.body.append('Audio error ' + music.error.code));
   </script>
 </body>
 </html>
